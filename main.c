@@ -5,9 +5,10 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <string.h>
+#include <stdbool.h>
 
-#define WIDTH 50
-#define HEIGHT 30
+#define WIDTH 20
+#define HEIGHT 10
 #define FPS 15
 
 void term_mode(int mode);
@@ -16,16 +17,21 @@ void update();
 void clear();
 
 char board[WIDTH * HEIGHT];
+char input;
 
 int main(void){
-
+  
   term_mode(1);
-  while(1){
+  do{
+    clear();
     init_board();
     update();
+    scanf("%c", &input);
     clear();
     usleep(1000 * 1000/FPS);
-  }
+  }while(input != 'q');
+  term_mode(0);
+  
   return 0;
 }
 
