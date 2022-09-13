@@ -11,15 +11,27 @@
 #define HEIGHT 10
 #define FPS 15
 
+typedef struct{
+  int x;
+  int y;
+}Snake;
+
+//typedef struct snake Snake;
+//typedef Snake *SnakePtr;
+
 void term_mode(int mode);
 void init_board();
 void update();
 void clear();
+void render_snake();
 
 char board[WIDTH * HEIGHT];
 char input;
+Snake *snake;
 
 int main(void){
+  
+  snake = malloc(sizeof(Snake));
   
   term_mode(1);
   do{
@@ -54,10 +66,17 @@ void init_board(){
 }
 
 void update(){
+  render_snake();
   for(int i=0; i<HEIGHT; i++){
     fwrite(&board[i*WIDTH], WIDTH, 1, stdout);
     fputc('\n', stdout);
   }
+}
+
+void render_snake(){
+  snake->x = 9;
+  snake->y = 0;
+  board[snake->x] = '#';
 }
 
 void clear(){
