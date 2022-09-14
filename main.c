@@ -16,9 +16,6 @@ typedef struct{
   int y;
 }Snake;
 
-//typedef struct snake Snake;
-//typedef Snake *SnakePtr;
-
 void term_mode(int mode);
 void init_board();
 void update();
@@ -94,6 +91,10 @@ void update(){
 }
 
 void render_snake(){
+  if(snake->x >= WIDTH) snake->x = 0;
+  else if(snake->x < 0) snake->x = WIDTH - 1;
+  if(snake->y >= HEIGHT) snake->y = 0;
+  else if(snake->y < 0) snake->y = HEIGHT - 1;
   board[(snake->y * WIDTH) + snake->x] = '#';
 }
 
