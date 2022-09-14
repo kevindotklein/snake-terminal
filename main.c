@@ -24,6 +24,10 @@ void init_board();
 void update();
 void clear();
 void render_snake();
+void snake_up();
+void snake_down();
+void snake_right();
+void snake_left();
 
 char board[WIDTH * HEIGHT];
 char input;
@@ -32,6 +36,8 @@ Snake *snake;
 int main(void){
   
   snake = malloc(sizeof(Snake));
+  snake->x = 9;
+  snake->y = 4;
   
   term_mode(1);
   do{
@@ -39,6 +45,20 @@ int main(void){
     init_board();
     update();
     scanf("%c", &input);
+    switch(input){
+    case 'w':
+      snake_up();
+      break;
+    case 's':
+      snake_down();
+      break;
+    case 'd':
+      snake_right();
+      break;
+    case 'a':
+      snake_left();
+      break;
+    }
     clear();
     usleep(1000 * 1000/FPS);
   }while(input != 'q');
@@ -74,9 +94,23 @@ void update(){
 }
 
 void render_snake(){
-  snake->x = 9;
-  snake->y = 0;
-  board[snake->x] = '#';
+  board[(snake->y * WIDTH) + snake->x] = '#';
+}
+
+void snake_up(){
+  snake->y--;
+}
+
+void snake_down(){
+  snake->y++;
+}
+
+void snake_right(){
+  snake->x++;
+}
+
+void snake_left(){
+  snake->x--;
 }
 
 void clear(){
