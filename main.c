@@ -6,14 +6,16 @@
 #include <sys/time.h>
 #include <string.h>
 #include <stdbool.h>
+#include <fcntl.h>
 
-#define WIDTH 20
-#define HEIGHT 10
+#define WIDTH 40
+#define HEIGHT 15
 #define FPS 15
 
 typedef struct{
   int x;
   int y;
+  int dir;
 }Snake;
 
 void term_mode(int mode);
@@ -35,29 +37,43 @@ int main(void){
   snake = malloc(sizeof(Snake));
   snake->x = 9;
   snake->y = 4;
-  
+  snake->dir = 0;
+
   term_mode(1);
   do{
     clear();
     init_board();
     update();
+    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
     scanf("%c", &input);
     switch(input){
     case 'w':
-      snake_up();
+      if(snake->dir != 2){
+	snake->dir = 1;
+	break;
+      }
       break;
     case 's':
-      snake_down();
+      if(snake->dir != 1){
+	snake->dir = 2;
+	break;
+      }
       break;
     case 'd':
-      snake_right();
+      if(snake->dir != 4){
+	snake->dir = 3;
+	break;
+      }
       break;
     case 'a':
-      snake_left();
+      if(snake->dir != 3){
+	snake->dir = 4;
+	break;
+      }
       break;
     }
     clear();
-    usleep(1000 * 1000/FPS);
+    usleep(1200 * 1200/FPS);
   }while(input != 'q');
   term_mode(0);
   
@@ -88,6 +104,10 @@ void update(){
     fwrite(&board[i*WIDTH], WIDTH, 1, stdout);
     fputc('\n', stdout);
   }
+  if(snake->dir == 1) snake_up();
+  if(snake->dir == 2) snake_down();
+  if(snake->dir == 3) snake_right();
+  if(snake->dir == 4) snake_left();
 }
 
 void render_snake(){
