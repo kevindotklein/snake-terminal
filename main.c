@@ -30,6 +30,12 @@ void snake_right();
 void snake_left();
 void render_node(node_t *head);
 void set_node(node_t **head);
+int get_snake_x();
+int get_snake_y();
+void node_up(node_t *tmp);
+void node_down(node_t *tmp);
+void node_right(node_t *tmp);
+void node_left(node_t *tmp);
 
 char board[WIDTH * HEIGHT];
 char input;
@@ -128,9 +134,9 @@ void update(){
     fputc('\n', stdout);
   }
   if(snake->dir == 1) snake_up();
-  if(snake->dir == 2) snake_down();
-  if(snake->dir == 3) snake_right();
-  if(snake->dir == 4) snake_left();
+  else if(snake->dir == 2) snake_down();
+  else if(snake->dir == 3) snake_right();
+  else if(snake->dir == 4) snake_left();
 }
 
 void render_snake(){
@@ -144,6 +150,20 @@ void render_snake(){
 void render_node(node_t *head){
   node_t *tmp = head;
   while(tmp != NULL){
+    switch(snake->dir){
+    case 1:
+      node_up(tmp);
+      break;
+    case 2:
+      node_down(tmp);
+      break;
+    case 3:
+      node_right(tmp);
+      break;
+    case 4:
+      node_left(tmp);
+      break;
+    }
     board[(tmp->y * WIDTH) + tmp->x] = 'A';
     tmp = tmp->next;
   }
@@ -152,10 +172,33 @@ void render_node(node_t *head){
 
 void set_node(node_t **head){
   node_t *node = malloc(sizeof(node_t));
-  node->x = 0;
-  node->y = 0;
+  node->x = get_snake_x() - 1;
+  node->y = get_snake_y();
   if(*head == NULL){
+    /*
+      switch(snake->dir){
+      case 1:
+	node->y = get_snake_y() + 1;
+	node->dir = 1;
+	break;
+      case 2:
+	node->x = get_snake_x() - 1;
+	node->dir = 2;
+	break;
+      case 3:
+	node->y = get_snake_y() - 1;
+	node->dir = 3;
+	break;
+      case 4:
+	node->x = get_snake_x() + 1;
+	node->dir = 4;
+	break;
+      }
+    */
+
     *head = node;
+  }else{
+    insert_at_end(*head, node);
   }
 }
 
@@ -173,6 +216,50 @@ void snake_right(){
 
 void snake_left(){
   snake->x--;
+}
+
+int get_snake_x(){
+  return snake->x;
+}
+
+int get_snake_y(){
+  return snake->y;
+}
+
+void node_right(node_t *tmp){
+  if(get_snake_x() == 0){
+    tmp->x = WIDTH - 1;
+  }else{
+    tmp->y = get_snake_y();
+    tmp->x = get_snake_x() - 1;
+  }
+}
+
+void node_up(node_t *tmp){
+  if(get_snake_y() == HEIGHT - 1){
+    tmp->y = 0;
+  }else{
+    tmp->x = get_snake_x();
+    tmp->y = get_snake_y() + 1;
+  }
+}
+
+void node_down(node_t *tmp){
+  if(get_snake_y() == 0){
+    tmp->y = HEIGHT - 1;
+  }else{
+    tmp->x = get_snake_x();
+    tmp->y = get_snake_y() - 1;
+  }
+}
+
+void node_left(node_t *tmp){
+  if(get_snake_x() == HEIGHT - 1){
+    tmp->x = 0;
+  }else{
+    tmp->y = get_snake_y();
+    tmp->x = get_snake_x() + 1;
+  }
 }
 
 void clear(){
