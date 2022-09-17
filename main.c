@@ -34,6 +34,7 @@ char board[WIDTH * HEIGHT];
 char input;
 snake_t *snake;
 node_t *test;
+node_t *test2;
 
 int main(void){
   
@@ -46,6 +47,11 @@ int main(void){
   test->y = 4;
   test->next = NULL;
   insert_at_end(test, test);
+  test2 = malloc(sizeof(node_t));
+  test2->x = 7;
+  test2->y = 4;
+  test2->next = NULL;
+  insert_at_end(test, test2);
 
   term_mode(1);
   do{

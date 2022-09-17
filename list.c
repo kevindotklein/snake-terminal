@@ -10,6 +10,8 @@ void insert_at_end(node_t *head, node_t *new_node){
   while(tmp != NULL){
     if(tmp->next == NULL){
       tmp->next = new_node;
+      return;
     }
+    tmp = tmp->next;
   }
 }
