@@ -29,12 +29,14 @@ void snake_down();
 void snake_right();
 void snake_left();
 void render_node(node_t *head);
+void set_node(node_t **head);
 
 char board[WIDTH * HEIGHT];
 char input;
 snake_t *snake;
-node_t *test;
-node_t *test2;
+//node_t *test;
+//node_t *test2;
+node_t *head;
 
 int main(void){
   
@@ -42,6 +44,11 @@ int main(void){
   snake->x = 9;
   snake->y = 4;
   snake->dir = 0;
+  head = NULL;
+
+  set_node(&head);
+  
+  /*
   test = malloc(sizeof(node_t));
   test->x = 8;
   test->y = 4;
@@ -52,6 +59,7 @@ int main(void){
   test2->y = 4;
   test2->next = NULL;
   insert_at_end(test, test2);
+  */
 
   term_mode(1);
   do{
@@ -114,7 +122,7 @@ void init_board(){
 
 void update(){
   render_snake();
-  render_node(test);
+  render_node(head);
   for(int i=0; i<HEIGHT; i++){
     fwrite(&board[i*WIDTH], WIDTH, 1, stdout);
     fputc('\n', stdout);
@@ -140,6 +148,15 @@ void render_node(node_t *head){
     tmp = tmp->next;
   }
   
+}
+
+void set_node(node_t **head){
+  node_t *node = malloc(sizeof(node_t));
+  node->x = 0;
+  node->y = 0;
+  if(*head == NULL){
+    *head = node;
+  }
 }
 
 void snake_up(){
