@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <fcntl.h>
+#include "list.h"
 
 #define WIDTH 40
 #define HEIGHT 15
@@ -16,7 +17,7 @@ typedef struct{
   int x;
   int y;
   int dir;
-}Snake;
+}snake_t;
 
 void term_mode(int mode);
 void init_board();
@@ -27,17 +28,24 @@ void snake_up();
 void snake_down();
 void snake_right();
 void snake_left();
+void render_node(node_t *head);
 
 char board[WIDTH * HEIGHT];
 char input;
-Snake *snake;
+snake_t *snake;
+node_t *test;
 
 int main(void){
   
-  snake = malloc(sizeof(Snake));
+  snake = malloc(sizeof(snake_t));
   snake->x = 9;
   snake->y = 4;
   snake->dir = 0;
+  test = malloc(sizeof(node_t));
+  test->x = 8;
+  test->y = 4;
+  test->next = NULL;
+  insert_at_end(test, test);
 
   term_mode(1);
   do{
@@ -100,6 +108,7 @@ void init_board(){
 
 void update(){
   render_snake();
+  render_node(test);
   for(int i=0; i<HEIGHT; i++){
     fwrite(&board[i*WIDTH], WIDTH, 1, stdout);
     fputc('\n', stdout);
@@ -116,6 +125,15 @@ void render_snake(){
   if(snake->y >= HEIGHT) snake->y = 0;
   else if(snake->y < 0) snake->y = HEIGHT - 1;
   board[(snake->y * WIDTH) + snake->x] = '#';
+}
+
+void render_node(node_t *head){
+  node_t *tmp = head;
+  while(tmp != NULL){
+    board[(tmp->y * WIDTH) + tmp->x] = 'A';
+    tmp = tmp->next;
+  }
+  
 }
 
 void snake_up(){
