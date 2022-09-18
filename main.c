@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <string.h>
-#include <stdbool.h>
 #include <fcntl.h>
 #include "list.h"
 
@@ -13,46 +12,39 @@
 #define HEIGHT 15
 #define FPS 15
 
-typedef struct{
-  int x;
-  int y;
-  int dir;
-}snake_t;
-
 void term_mode(int mode);
 void init_board();
+void render_board();
 void update();
 void clear();
-void render_snake();
-void snake_up();
-void snake_down();
-void snake_right();
-void snake_left();
-void render_node(node_t *head);
-void set_node(node_t **head);
-int get_snake_x();
-int get_snake_y();
-void node_up(node_t *tmp);
-void node_down(node_t *tmp);
-void node_right(node_t *tmp);
-void node_left(node_t *tmp);
+void render_nodes(node_t *head);
+void node_up(node_t *node);
+void node_down(node_t *node);
+void node_right(node_t *node);
+void node_left(node_t *node);
+//void snake_up();//
+//void snake_down();//
+//void snake_right();//
+//void snake_left();//
+//void render_node(node_t *head);//
+//void set_node(node_t **head);//
+//int get_snake_x();//
+//int get_snake_y();//
+//void node_up(node_t *tmp);//
+//void node_down(node_t *tmp);//
+//void node_right(node_t *tmp);//
+//void node_left(node_t *tmp);//
 
 char board[WIDTH * HEIGHT];
 char input;
-snake_t *snake;
-//node_t *test;
-//node_t *test2;
 node_t *head;
 
 int main(void){
-  
-  snake = malloc(sizeof(snake_t));
-  snake->x = 9;
-  snake->y = 4;
-  snake->dir = 0;
-  head = NULL;
 
-  //set_node(&head);
+  head = malloc(sizeof(node_t));
+  head->x = 9;
+  head->y = 4;
+  head->dir = 0;
 
   term_mode(1);
   do{
@@ -63,26 +55,26 @@ int main(void){
     scanf("%c", &input);
     switch(input){
     case 'w':
-      if(snake->dir != 2){
-	snake->dir = 1;
+      if(head->dir != 2){
+	head->dir = 1;
 	break;
       }
       break;
     case 's':
-      if(snake->dir != 1){
-	snake->dir = 2;
+      if(head->dir != 1){
+	head->dir = 2;
 	break;
       }
       break;
     case 'd':
-      if(snake->dir != 4){
-	snake->dir = 3;
+      if(head->dir != 4){
+	head->dir = 3;
 	break;
       }
       break;
     case 'a':
-      if(snake->dir != 3){
-	snake->dir = 4;
+      if(head->dir != 3){
+	head->dir = 4;
 	break;
       }
       break;
@@ -113,84 +105,57 @@ void init_board(){
   memset(board, '.', WIDTH * HEIGHT);
 }
 
-void update(){
-  render_snake();
-  render_node(head);
+void render_board(){
   for(int i=0; i<HEIGHT; i++){
     fwrite(&board[i*WIDTH], WIDTH, 1, stdout);
     fputc('\n', stdout);
   }
-  if(snake->dir == 1) snake_up();
-  else if(snake->dir == 2) snake_down();
-  else if(snake->dir == 3) snake_right();
-  else if(snake->dir == 4) snake_left();
+}
 
+void update(){
+
+  render_nodes(head);
+  render_board();
+  
+  if(head->dir == 1) node_up(head);
+  else if(head->dir == 2) node_down(head);
+  else if(head->dir == 3) node_right(head);
+  else if(head->dir == 4) node_left(head);
+  /*
   if(get_snake_x() == 20 && get_snake_y() == 4){
     set_node(&head);
   }
+  */
 }
 
-void render_snake(){
-  if(snake->x >= WIDTH) snake->x = 0;
-  else if(snake->x < 0) snake->x = WIDTH - 1;
-  if(snake->y >= HEIGHT) snake->y = 0;
-  else if(snake->y < 0) snake->y = HEIGHT - 1;
-  board[(snake->y * WIDTH) + snake->x] = '#';
-}
-
-void render_node(node_t *head){
+void render_nodes(node_t *head){
   node_t *tmp = head;
-  //int prev_dir;
-  //node_t *tar = NULL;
   while(tmp != NULL){
-    if(tmp == head){
-      switch(snake->dir){
-      case 1:
-	node_up(tmp);
-	break;
-      case 2:
-	node_down(tmp);
-	break;
-      case 3:
-	node_right(tmp);
-	break;
-      case 4:
-	node_left(tmp);
-	break;
-      }
-    }//else{
-      //if(!(tmp->next == NULL)){
-
-	switch(tmp->dir){
-	case 1:
-	  follow_up(head, tmp);
-	  break;
-	case 2:
-	  follow_down(head, tmp);
-	  break;
-	case 3:
-	  follow_right(head, tmp);
-	  break;
-	case 4:
-	  follow_left(head, tmp);
-	  break;
-	default:
-	  break;
-	}
-    
-      
-	//prev_dir = tmp->dir;
-	//tar = tmp;
-      //}
-      
-	//}
-	//prev_dir = get_node_dir(tmp);
+    if(tmp->x >= WIDTH) tmp->x = 0;
+    else if(tmp->x < 0) tmp->x = WIDTH - 1;
+    if(tmp->y >= HEIGHT) tmp->y = 0;
+    else if(tmp->y < 0) tmp->y = HEIGHT - 1;
     board[(tmp->y * WIDTH) + tmp->x] = '#';
     tmp = tmp->next;
   }
-  
 }
 
+void node_up(node_t *node){
+  node->y--;
+}
+
+void node_down(node_t *node){
+  node->y++;
+}
+
+void node_right(node_t *node){
+  node->x++;
+}
+
+void node_left(node_t *node){
+  node->x--;
+}
+/*
 void set_node(node_t **head){
   node_t *node = malloc(sizeof(node_t));
   node_t *tmp = *head;
@@ -248,70 +213,7 @@ void set_node(node_t **head){
     insert_at_end(*head, node);
   }
 }
-
-void snake_up(){
-  snake->y--;
-}
-
-void snake_down(){
-  snake->y++;
-}
-
-void snake_right(){
-  snake->x++;
-}
-
-void snake_left(){
-  snake->x--;
-}
-
-int get_snake_x(){
-  return snake->x;
-}
-
-int get_snake_y(){
-  return snake->y;
-}
-
-void node_right(node_t *tmp){
-  tmp->dir = 3;
-  if(get_snake_x() == 0){
-    tmp->x = WIDTH - 1;
-  }else{
-    tmp->y = get_snake_y();
-    tmp->x = get_snake_x() - 1;
-  }
-}
-
-void node_up(node_t *tmp){
-  tmp->dir = 1;
-  if(get_snake_y() == HEIGHT - 1){
-    tmp->y = 0;
-  }else{
-    tmp->x = get_snake_x();
-    tmp->y = get_snake_y() + 1;
-  }
-}
-
-void node_down(node_t *tmp){
-  tmp->dir = 2;
-  if(get_snake_y() == 0){
-    tmp->y = HEIGHT - 1;
-  }else{
-    tmp->x = get_snake_x();
-    tmp->y = get_snake_y() - 1;
-  }
-}
-
-void node_left(node_t *tmp){
-  tmp->dir = 4;
-  if(get_snake_x() == WIDTH - 1){
-    tmp->x = 0;
-  }else{
-    tmp->y = get_snake_y();
-    tmp->x = get_snake_x() + 1;
-  }
-}
+*/
 
 void clear(){
   fprintf(stdout, "\033[2J");
