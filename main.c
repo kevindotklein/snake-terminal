@@ -140,6 +140,8 @@ void render_snake(){
 
 void render_node(node_t *head){
   node_t *tmp = head;
+  //int prev_dir;
+  //node_t *tar = NULL;
   while(tmp != NULL){
     if(tmp == head){
       switch(snake->dir){
@@ -156,8 +158,34 @@ void render_node(node_t *head){
 	node_left(tmp);
 	break;
       }
-    }
-    board[(tmp->y * WIDTH) + tmp->x] = 'A';
+    }//else{
+      //if(!(tmp->next == NULL)){
+
+	switch(tmp->dir){
+	case 1:
+	  follow_up(head, tmp);
+	  break;
+	case 2:
+	  follow_down(head, tmp);
+	  break;
+	case 3:
+	  follow_right(head, tmp);
+	  break;
+	case 4:
+	  follow_left(head, tmp);
+	  break;
+	default:
+	  break;
+	}
+    
+      
+	//prev_dir = tmp->dir;
+	//tar = tmp;
+      //}
+      
+	//}
+	//prev_dir = get_node_dir(tmp);
+    board[(tmp->y * WIDTH) + tmp->x] = '#';
     tmp = tmp->next;
   }
   
@@ -165,8 +193,9 @@ void render_node(node_t *head){
 
 void set_node(node_t **head){
   node_t *node = malloc(sizeof(node_t));
-  //node->x = get_snake_x() - 1;
-  //node->y = get_snake_y();
+  node_t *tmp = *head;
+  int prev_dir = 0;
+  
   if(*head == NULL){
     switch(snake->dir){
     case 1:
@@ -188,6 +217,34 @@ void set_node(node_t **head){
     }
     *head = node;
   }else{
+    while(tmp != NULL){
+      if(tmp->next == NULL){
+	prev_dir = tmp->dir;
+	switch(prev_dir){
+	case 1:
+	  node->dir = prev_dir;
+	  node->x = get_node_x(tmp);
+	  node->y = get_node_y(tmp) + 1;
+	  break;
+	case 2:
+	  node->dir = prev_dir;
+	  node->x = get_node_x(tmp);
+	  node->y = get_node_y(tmp) - 1;
+	  break;
+	case 3:
+	  node->dir = prev_dir;
+	  node->x = get_node_x(tmp) - 1;
+	  node->y = get_node_y(tmp);	  
+	  break;
+	case 4:
+	  node->dir = prev_dir;
+	  node->x = get_node_x(tmp) + 1;
+	  node->y = get_node_y(tmp);
+	  break;
+	}
+      }
+      tmp = tmp->next;
+    }
     insert_at_end(*head, node);
   }
 }
@@ -217,6 +274,7 @@ int get_snake_y(){
 }
 
 void node_right(node_t *tmp){
+  tmp->dir = 3;
   if(get_snake_x() == 0){
     tmp->x = WIDTH - 1;
   }else{
@@ -226,6 +284,7 @@ void node_right(node_t *tmp){
 }
 
 void node_up(node_t *tmp){
+  tmp->dir = 1;
   if(get_snake_y() == HEIGHT - 1){
     tmp->y = 0;
   }else{
@@ -235,6 +294,7 @@ void node_up(node_t *tmp){
 }
 
 void node_down(node_t *tmp){
+  tmp->dir = 2;
   if(get_snake_y() == 0){
     tmp->y = HEIGHT - 1;
   }else{
@@ -244,7 +304,8 @@ void node_down(node_t *tmp){
 }
 
 void node_left(node_t *tmp){
-  if(get_snake_x() == HEIGHT - 1){
+  tmp->dir = 4;
+  if(get_snake_x() == WIDTH - 1){
     tmp->x = 0;
   }else{
     tmp->y = get_snake_y();
