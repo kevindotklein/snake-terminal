@@ -23,18 +23,6 @@ void node_down(node_t *node);
 void node_right(node_t *node);
 void node_left(node_t *node);
 void add_node(node_t *head);
-//void snake_up();//
-//void snake_down();//
-//void snake_right();//
-//void snake_left();//
-//void render_node(node_t *head);//
-//void set_node(node_t **head);//
-//int get_snake_x();//
-//int get_snake_y();//
-//void node_up(node_t *tmp);//
-//void node_down(node_t *tmp);//
-//void node_right(node_t *tmp);//
-//void node_left(node_t *tmp);//
 
 char board[WIDTH * HEIGHT];
 char input;
@@ -104,6 +92,8 @@ void term_mode(int mode){
 
 void init_board(){
   memset(board, '.', WIDTH * HEIGHT);
+  //
+  board[(4 * WIDTH) + 20] = 'X';
 }
 
 void render_board(){
@@ -115,17 +105,22 @@ void render_board(){
 
 void update(){
 
-  render_nodes(head);
-  render_board();
-  
   if(head->dir == 1) node_up(head);
   else if(head->dir == 2) node_down(head);
   else if(head->dir == 3) node_right(head);
   else if(head->dir == 4) node_left(head);
+
+  render_nodes(head);
+  
+  render_board();
+
+  if(head->x >= WIDTH) input = 'q';
+  else if(head->x < 0) input = 'q';
+  if(head->y >= HEIGHT) input = 'q';
+  else if(head->y < 0) input = 'q';
   
   if(get_node_x(head) == 20 && get_node_y(head) == 4){
-  board[(4 * WIDTH) + 20] = 'X';
-  add_node(head);
+    add_node(head);
   }
   
 }
@@ -134,14 +129,9 @@ void render_nodes(node_t *head){
   node_t *tmp = head;
   
   while(tmp != NULL){
-    if(tmp->x >= WIDTH) tmp->x = 0;
-    else if(tmp->x < 0) tmp->x = WIDTH - 1;
-    if(tmp->y >= HEIGHT) tmp->y = 0;
-    else if(tmp->y < 0) tmp->y = HEIGHT - 1;
-    board[(tmp->y * WIDTH) + tmp->x] = '#';
 
     if(!(tmp->next == NULL)){
-      //definir x,y dos proxs
+   
       switch(tmp->dir){
       case 1:
 	tmp->next->x = get_node_x(tmp);
@@ -166,19 +156,19 @@ void render_nodes(node_t *head){
       node_t *aux = head;
       while(aux != NULL){
 	if(aux->next == tmp){
-	  //definir dir baseado no x,y do da frente
+	 
 	  if(aux->y < tmp->y) tmp->dir = 1;
-	  else if(aux->y > tmp->y) tmp->dir = 2;
-	  else if(aux->x > tmp->x) tmp->dir = 3;
-	  else if(aux->x < tmp->x) tmp->dir = 4;
+	  if(aux->y > tmp->y) tmp->dir = 2;
+	  if(aux->x > tmp->x) tmp->dir = 3;
+	  if(aux->x < tmp->x) tmp->dir = 4;
 	}
 	aux = aux->next;
       }
     }
-    
+    board[(tmp->y * WIDTH) + tmp->x] = '#';
     tmp = tmp->next;
   }
-  //redefinir dir baseado no x,y da node da frente (tirando o head obviamente)
+  
 }
 
 void node_up(node_t *node){
@@ -229,66 +219,6 @@ void add_node(node_t *head){
     tmp = tmp->next;
   }
 }
-
-/*
-void set_node(node_t **head){
-  node_t *node = malloc(sizeof(node_t));
-  node_t *tmp = *head;
-  int prev_dir = 0;
-  
-  if(*head == NULL){
-    switch(snake->dir){
-    case 1:
-      node->x = get_snake_x();
-      node->y = get_snake_y() + 1;
-      break;
-    case 2:
-      node->x = get_snake_x();
-      node->y = get_snake_y() - 1;
-      break;
-    case 3:
-      node->x = get_snake_x() - 1;
-      node->y = get_snake_y();
-      break;
-    case 4:
-      node->x = get_snake_x() + 1;
-      node->y = get_snake_y();
-      break;
-    }
-    *head = node;
-  }else{
-    while(tmp != NULL){
-      if(tmp->next == NULL){
-	prev_dir = tmp->dir;
-	switch(prev_dir){
-	case 1:
-	  node->dir = prev_dir;
-	  node->x = get_node_x(tmp);
-	  node->y = get_node_y(tmp) + 1;
-	  break;
-	case 2:
-	  node->dir = prev_dir;
-	  node->x = get_node_x(tmp);
-	  node->y = get_node_y(tmp) - 1;
-	  break;
-	case 3:
-	  node->dir = prev_dir;
-	  node->x = get_node_x(tmp) - 1;
-	  node->y = get_node_y(tmp);	  
-	  break;
-	case 4:
-	  node->dir = prev_dir;
-	  node->x = get_node_x(tmp) + 1;
-	  node->y = get_node_y(tmp);
-	  break;
-	}
-      }
-      tmp = tmp->next;
-    }
-    insert_at_end(*head, node);
-  }
-}
-*/
 
 void clear(){
   fprintf(stdout, "\033[2J");
