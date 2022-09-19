@@ -30,6 +30,12 @@ int gen_allowed_x(node_t *head);
 int gen_allowed_y(node_t *head);
 void render_score();
 void debug_mode(int mode, node_t *head);
+void render_title();
+void check_collision(node_t *head);
+void render_lose();
+void render_win();
+void render_help();
+void render_pause();
 
 char board[WIDTH * HEIGHT];
 char input;
@@ -38,8 +44,12 @@ egg_t *egg;
 int egg_x;
 int egg_y;
 int score=0;
+int prev_x;
+char prev_input;
+int pause_sec = 3;
 
 int main(void){
+  char proceed;
   srand(time(NULL));
 
   head = malloc(sizeof(node_t));
@@ -51,6 +61,9 @@ int main(void){
   egg_y = gen_allowed_y(head);
 
   term_mode(1);
+  clear();
+  render_help();
+  scanf("%c", &proceed);
   do{
     clear();
     init_board();
@@ -60,35 +73,58 @@ int main(void){
     scanf("%c", &input);
     switch(input){
     case 'w':
+      prev_input = 'w';
       if(head->dir != 2){
 	head->dir = 1;
 	break;
       }
       break;
     case 's':
+      prev_input = 's';
       if(head->dir != 1){
 	head->dir = 2;
 	break;
       }
       break;
     case 'd':
+      prev_input = 'd';
       if(head->dir != 4){
 	head->dir = 3;
 	break;
       }
       break;
     case 'a':
+      prev_input = 'a';
       if(head->dir != 3){
 	head->dir = 4;
 	break;
       }
+      break;
+    case 'p':
+      pause_sec = 3;
+      clear();
+      while(pause_sec >= 0){
+      render_pause();
+      sleep(1);
+      pause_sec--;
+      clear();
+      }
+      input = prev_input;
       break;
     }
     clear();
     usleep(1200 * 1200/FPS);
     
   }while(input != 'q');
-  //clear();
+  clear();
+  if(score >= 25){
+    render_win();
+    sleep(1);
+  }else{
+    render_lose();
+    sleep(1);
+  }
+  clear();
   term_mode(0);
   
   return 0;
@@ -122,31 +158,37 @@ void render_board(){
 void update(){
   
   if(input != 'q'){
-  if(head->dir == 1) node_up(head);
-  else if(head->dir == 2) node_down(head);
-  else if(head->dir == 3) node_right(head);
-  else if(head->dir == 4) node_left(head);
+    if(head->dir == 1) node_up(head);
+    else if(head->dir == 2) node_down(head);
+    else if(head->dir == 3) node_right(head);
+    else if(head->dir == 4) node_left(head);
 
-  egg = spawn_egg(egg_x, egg_y);
-  render_nodes(head);
+    egg = spawn_egg(egg_x, egg_y);
+    render_nodes(head);
 
-  //render_score();
-  render_board();
-  //render_score();
-  debug_mode(1, head);
+    render_title();
+    render_board();
+    render_score();
+    debug_mode(1, head);
 
-  if(get_node_x(head) == egg_x && get_node_y(head) == egg_y){
-    add_node(head);
-    egg_x = gen_allowed_x(head);
-    egg_y = gen_allowed_y(head);
+    if(score == 25){
+      input = 'q';
+    }
+
+    if(get_node_x(head) == egg_x && get_node_y(head) == egg_y){
+      add_node(head);
+      score++;
+      egg_x = gen_allowed_x(head);
+      egg_y = gen_allowed_y(head);
+    }
   }
-  }
 
-  //
-    if(head->x >= WIDTH) input = 'q';
-  if(head->x < 0) input = 'q';
+  check_collision(head);
+  
+  if(head->x >= WIDTH) input = 'q';
+  else if(head->x < 0) input = 'q';
   if(head->y >= HEIGHT) input = 'q';
-  if(head->y < 0) input = 'q';
+  else if(head->y < 0) input = 'q';
 }
 
 void render_nodes(node_t *head){
@@ -298,10 +340,49 @@ void render_score(){
 
 void debug_mode(int mode, node_t *head){
   if(mode == 1){
+    if(prev_x == WIDTH-1 && get_node_x(head) == 0){
+      input = 'q';
+    }
+
+    prev_x = get_node_x(head);
+    
     fprintf(stdout, "X: %d | Y: %d | INPUT: %c\n", get_node_x(head), get_node_y(head), input);
   }else{
     return;
   }
+}
+
+void render_title(){
+  fprintf(stdout, "SNAKE-TERMINAL by kevin\n");
+}
+
+void check_collision(node_t *head){
+  node_t *tmp = head;
+  while(tmp != NULL){
+    if(tmp != head){
+      if(get_node_x(head) == get_node_x(tmp) && get_node_y(head) == get_node_y(tmp)){
+	input = 'q';
+	break;
+      }
+    }
+    tmp = tmp->next;
+  }
+}
+
+void render_lose(){
+  fprintf(stdout, "you lost :(\n");
+}
+
+void render_win(){
+  fprintf(stdout, "you won :)\n");
+}
+
+void render_help(){
+  fprintf(stdout, "commands:\nq = quit\np = pause\n\nmoves:\nw = up\na = left\ns = down\nd = right\n\ncollect 25 eggs to win\n\npress any key to start...\n");
+}
+
+void render_pause(){
+  fprintf(stdout, "game paused for %ds\n", pause_sec);
 }
 
 void clear(){
