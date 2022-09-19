@@ -121,16 +121,8 @@ void update(){
   else if(head->dir == 2) node_down(head);
   else if(head->dir == 3) node_right(head);
   else if(head->dir == 4) node_left(head);
-  
-  //int not_allowed_x[size] = gen_not_allowed_x(head);
-  //int not_allowed_y[size] = gen_not_allowed_y(head);
 
-  //int egg_x = gen_allowed_x(not_allowed_x, 1);
-  //int egg_y = gen_allowed_y(not_allowed_y, 1);
-
-  //int egg_x = gen_allowed_x(head);
   spawn_egg(egg_x, egg_y);
-  //spawn_egg(20, 7);//
   render_nodes(head);
   
   render_board();
@@ -242,31 +234,39 @@ void add_node(node_t *head){
 }
 
 int gen_allowed_x(node_t *head){
-  node_t *tmp = head;
+  int pass=-1;
   int x;
-  while(tmp != NULL){
+  while(pass == -1){
+    node_t *tmp = head;
     x = rand() % WIDTH;
-    if(x == get_node_x(tmp)){
-      continue;
-    }else{
-      break;
+    while(tmp != NULL){
+      if(x == get_node_x(tmp)){
+	break;
+      }else{
+	pass=0;
+	break;
+      }
+      tmp = tmp->next;
     }
-    tmp = tmp->next;
   }
   return x;
 }
 
 int gen_allowed_y(node_t *head){
-  node_t *tmp = head;
+  int pass=-1;
   int y;
-  while(tmp != NULL){
+  while(pass == -1){
+    node_t *tmp = head;
     y = rand() % HEIGHT;
-    if(y == get_node_y(tmp)){
-      continue;
-    }else{
-      break;
+    while(tmp != NULL){
+      if(y == get_node_y(tmp)){
+	break;
+      }else{
+	pass=0;
+	break;
+      }
+      tmp = tmp->next;
     }
-    tmp = tmp->next;
   }
   return y;
 }
