@@ -25,7 +25,7 @@ void node_down(node_t *node);
 void node_right(node_t *node);
 void node_left(node_t *node);
 void add_node(node_t *head);
-void spawn_egg(int x, int y);
+egg_t *spawn_egg(int x, int y);
 int gen_allowed_x(node_t *head);
 int gen_allowed_y(node_t *head);
 
@@ -33,8 +33,8 @@ char board[WIDTH * HEIGHT];
 char input;
 node_t *head;
 egg_t *egg;
-int egg_x;//
-int egg_y;//
+int egg_x;
+int egg_y;
 
 int main(void){
   srand(time(NULL));
@@ -44,7 +44,7 @@ int main(void){
   head->y = 4;
   head->dir = 0;
 
-  egg_x = gen_allowed_x(head);//
+  egg_x = gen_allowed_x(head);
   egg_y = gen_allowed_y(head);
 
   term_mode(1);
@@ -104,8 +104,6 @@ void term_mode(int mode){
 
 void init_board(){
   memset(board, '.', WIDTH * HEIGHT);
-  //
-  board[(4 * WIDTH) + 20] = 'X';
 }
 
 void render_board(){
@@ -122,7 +120,7 @@ void update(){
   else if(head->dir == 3) node_right(head);
   else if(head->dir == 4) node_left(head);
 
-  spawn_egg(egg_x, egg_y);
+  egg = spawn_egg(egg_x, egg_y);
   render_nodes(head);
   
   render_board();
@@ -131,9 +129,11 @@ void update(){
   else if(head->x < 0) input = 'q';
   if(head->y >= HEIGHT) input = 'q';
   else if(head->y < 0) input = 'q';
-  
-  if(get_node_x(head) == 20 && get_node_y(head) == 4){
+
+  if(get_node_x(head) == egg_x && get_node_y(head) == egg_y){
     add_node(head);
+    egg_x = gen_allowed_x(head);
+    egg_y = gen_allowed_y(head);
   }
   
 }
@@ -271,13 +271,14 @@ int gen_allowed_y(node_t *head){
   return y;
 }
 
-void spawn_egg(int x, int y){
+egg_t *spawn_egg(int x, int y){
 
   egg_t *egg = malloc(sizeof(egg_t));
   egg->x = x;
   egg->y = y;
 
   board[(egg->y * WIDTH) + egg->x] = 'O';
+  return egg;
 }
 
 void clear(){
