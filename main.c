@@ -6,7 +6,9 @@
 #include <sys/time.h>
 #include <string.h>
 #include <fcntl.h>
+#include <time.h>
 #include "list.h"
+#include "egg.h"
 
 #define WIDTH 40
 #define HEIGHT 15
@@ -23,17 +25,27 @@ void node_down(node_t *node);
 void node_right(node_t *node);
 void node_left(node_t *node);
 void add_node(node_t *head);
+void spawn_egg(int x, int y);
+int gen_allowed_x(node_t *head);
+int gen_allowed_y(node_t *head);
 
 char board[WIDTH * HEIGHT];
 char input;
 node_t *head;
+egg_t *egg;
+int egg_x;//
+int egg_y;//
 
 int main(void){
+  srand(time(NULL));
 
   head = malloc(sizeof(node_t));
   head->x = 9;
   head->y = 4;
   head->dir = 0;
+
+  egg_x = gen_allowed_x(head);//
+  egg_y = gen_allowed_y(head);
 
   term_mode(1);
   do{
@@ -109,7 +121,16 @@ void update(){
   else if(head->dir == 2) node_down(head);
   else if(head->dir == 3) node_right(head);
   else if(head->dir == 4) node_left(head);
+  
+  //int not_allowed_x[size] = gen_not_allowed_x(head);
+  //int not_allowed_y[size] = gen_not_allowed_y(head);
 
+  //int egg_x = gen_allowed_x(not_allowed_x, 1);
+  //int egg_y = gen_allowed_y(not_allowed_y, 1);
+
+  //int egg_x = gen_allowed_x(head);
+  spawn_egg(egg_x, egg_y);
+  //spawn_egg(20, 7);//
   render_nodes(head);
   
   render_board();
@@ -218,6 +239,45 @@ void add_node(node_t *head){
     }
     tmp = tmp->next;
   }
+}
+
+int gen_allowed_x(node_t *head){
+  node_t *tmp = head;
+  int x;
+  while(tmp != NULL){
+    x = rand() % WIDTH;
+    if(x == get_node_x(tmp)){
+      continue;
+    }else{
+      break;
+    }
+    tmp = tmp->next;
+  }
+  return x;
+}
+
+int gen_allowed_y(node_t *head){
+  node_t *tmp = head;
+  int y;
+  while(tmp != NULL){
+    y = rand() % HEIGHT;
+    if(y == get_node_y(tmp)){
+      continue;
+    }else{
+      break;
+    }
+    tmp = tmp->next;
+  }
+  return y;
+}
+
+void spawn_egg(int x, int y){
+
+  egg_t *egg = malloc(sizeof(egg_t));
+  egg->x = x;
+  egg->y = y;
+
+  board[(egg->y * WIDTH) + egg->x] = 'O';
 }
 
 void clear(){
