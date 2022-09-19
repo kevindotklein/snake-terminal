@@ -28,6 +28,8 @@ void add_node(node_t *head);
 egg_t *spawn_egg(int x, int y);
 int gen_allowed_x(node_t *head);
 int gen_allowed_y(node_t *head);
+void render_score();
+void debug_mode(int mode, node_t *head);
 
 char board[WIDTH * HEIGHT];
 char input;
@@ -35,6 +37,7 @@ node_t *head;
 egg_t *egg;
 int egg_x;
 int egg_y;
+int score=0;
 
 int main(void){
   srand(time(NULL));
@@ -52,6 +55,7 @@ int main(void){
     clear();
     init_board();
     update();
+    if(input == 'q') break;
     fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
     scanf("%c", &input);
     switch(input){
@@ -82,7 +86,9 @@ int main(void){
     }
     clear();
     usleep(1200 * 1200/FPS);
+    
   }while(input != 'q');
+  //clear();
   term_mode(0);
   
   return 0;
@@ -114,7 +120,8 @@ void render_board(){
 }
 
 void update(){
-
+  
+  if(input != 'q'){
   if(head->dir == 1) node_up(head);
   else if(head->dir == 2) node_down(head);
   else if(head->dir == 3) node_right(head);
@@ -122,20 +129,24 @@ void update(){
 
   egg = spawn_egg(egg_x, egg_y);
   render_nodes(head);
-  
-  render_board();
 
-  if(head->x >= WIDTH) input = 'q';
-  else if(head->x < 0) input = 'q';
-  if(head->y >= HEIGHT) input = 'q';
-  else if(head->y < 0) input = 'q';
+  //render_score();
+  render_board();
+  //render_score();
+  debug_mode(1, head);
 
   if(get_node_x(head) == egg_x && get_node_y(head) == egg_y){
     add_node(head);
     egg_x = gen_allowed_x(head);
     egg_y = gen_allowed_y(head);
   }
-  
+  }
+
+  //
+    if(head->x >= WIDTH) input = 'q';
+  if(head->x < 0) input = 'q';
+  if(head->y >= HEIGHT) input = 'q';
+  if(head->y < 0) input = 'q';
 }
 
 void render_nodes(node_t *head){
@@ -279,6 +290,18 @@ egg_t *spawn_egg(int x, int y){
 
   board[(egg->y * WIDTH) + egg->x] = 'O';
   return egg;
+}
+
+void render_score(){
+  fprintf(stdout, "SCORE: %d\n", score);
+}
+
+void debug_mode(int mode, node_t *head){
+  if(mode == 1){
+    fprintf(stdout, "X: %d | Y: %d | INPUT: %c\n", get_node_x(head), get_node_y(head), input);
+  }else{
+    return;
+  }
 }
 
 void clear(){
