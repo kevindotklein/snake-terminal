@@ -1,3 +1,7 @@
+<h1 align="center">
+	<img alt="snake game" title="snake game" src="./gif.gif" />
+</h1>
+
 (linux only)
 
 commands:<br>
