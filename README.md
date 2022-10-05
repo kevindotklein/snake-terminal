@@ -1,7 +1,9 @@
 (linux only)
 
-commands: q(quit), p(pause)
+commands:<br>
+<kbd>q</kbd> (quit), <kbd>p</kbd> (pause)<br>
 
-movement: w(up), s(down), a(left), d(right)
+movement:<br>
+<kbd>w</kbd> (up), <kbd>s</kbd> (down), <kbd>a</kbd> (left), <kbd>d</kbd> (right)
 
 
